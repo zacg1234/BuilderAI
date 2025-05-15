@@ -7,11 +7,52 @@ from utils import output_folder_path
   
 def create_file(path: str, content: str) -> str:
     full_path = output_folder_path + "/" + path
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)  # Ensure parent dirs exist
     if os.path.isfile(full_path):
         os.remove(full_path)
     with open(full_path, "w") as f:
         f.write(content)
     return f"File '{path}' created with this content: \n{content}"
+
+def log(my_name: str, content: str) -> str:
+    log_content = f"LOGGING {my_name}: {content}"
+    write_log_entry("LOGGING" + my_name +  ": " + content)
+    return f"The folowing was logged: {log_content}"
+
+def insert_after_substring(path: str, substring: str, additional_content: str) -> str:
+    full_path = output_folder_path + "/" + path
+    try:
+        with open(full_path, "r") as f:
+            content = f.read()
+        index = content.find(substring)
+        if index == -1:
+            return f"Substring '{substring}' not found in '{path}'."
+        insert_pos = index + len(substring)
+        new_content = content[:insert_pos] + additional_content + content[insert_pos:]
+        with open(full_path, "w") as f:
+            f.write(new_content)
+        return f"Inserted content after '{substring}' in '{path}'."
+    except FileNotFoundError:
+        return f"File '{path}' not found."
+    except Exception as e:
+        return f"Error: {e}"
+    
+def insert_before_substring(path: str, substring: str, additional_content: str) -> str:
+    full_path = output_folder_path + "/" + path
+    try:
+        with open(full_path, "r") as f:
+            content = f.read()
+        index = content.find(substring)
+        if index == -1:
+            return f"Substring '{substring}' not found in '{path}'."
+        new_content = content[:index] + additional_content + content[index:]
+        with open(full_path, "w") as f:
+            f.write(new_content)
+        return f"Inserted content before '{substring}' in '{path}'."
+    except FileNotFoundError:
+        return f"File '{path}' not found."
+    except Exception as e:
+        return f"Error: {e}"
 
 def read_file(path: str) -> str:
     try:
@@ -53,7 +94,46 @@ tools = [
         "required": ["path", "content"]
         } 
     },
-
+     {
+        "type": "function",
+        "name": "log",
+        "description": "Log a message with the agent's name.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "content": {"type": "string"},
+            },
+            "required": ["content"]
+        }
+    },
+    {
+        "type": "function",
+        "name": "insert_after_substring",
+        "description": "Insert additional content into a file immediately after the first occurance of a given substring. So choose the shortest unique substring to append after",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string"},
+                "substring": {"type": "string"},
+                "additional_content": {"type": "string"},
+            },
+            "required": ["path", "substring", "additional_content"]
+        }
+    },
+    {
+        "type": "function",
+        "name": "insert_before_substring",
+        "description": "Insert additional content into a file immediately before the first occurrence of a given substring. So choose the shortest unique substring to prepend before.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string"},
+                "substring": {"type": "string"},
+                "additional_content": {"type": "string"},
+            },
+            "required": ["path", "substring", "additional_content"]
+        }
+    },
     {
         "type": "function",
         "name": "read_file",
@@ -85,10 +165,9 @@ tools = [
         "parameters": {
             "type": "object",
             "properties": {
-                "my_name": {"type": "string"},
                 "prompt": {"type": "string"},
             },
-            "required": ["my_name", "prompt"]
+            "required": [ "prompt"]
         }
     },
     {
@@ -98,10 +177,9 @@ tools = [
         "parameters": {
             "type": "object",
             "properties": {
-                "my_name": {"type": "string"},
                 "prompt": {"type": "string"},
             },
-            "required": ["my_name", "prompt"]
+            "required": ["prompt"]
         }
     },
     {
@@ -111,10 +189,9 @@ tools = [
         "parameters": {
             "type": "object",
             "properties": {
-                "my_name": {"type": "string"},
                 "prompt": {"type": "string"},
             },
-            "required": ["my_name", "prompt"]
+            "required": ["prompt"]
         }
     }
 ]
