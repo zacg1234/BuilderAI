@@ -29,16 +29,16 @@ def run_engineers_for_tasks():
 
 # Command-line interaction
 def run():
-    # reset_output_folder()
-    # delete_log_file()
+    reset_output_folder()
+    delete_log_file()
 
-    # print("🧠 AI Agent Prototype Started")
-    # user_prompt = input("\nWhat are we building today? ").strip()
+    print("🧠 AI Agent Prototype Started")
+    user_prompt = input("\nWhat are we building today? ").strip()
 
-    # # Provide the agent with more context
-    # AIAgentFactory.get_product().run(user_prompt)
-    # AIAgentFactory.get_architect().run("")
-    # AIAgentFactory.get_architect_qa().run("")
+    # Provide the agent with more context
+    AIAgentFactory.get_product().run(user_prompt)
+    AIAgentFactory.get_architect().run("")
+    AIAgentFactory.get_architect_qa().run("")
     run_engineers_for_tasks()
 
        
